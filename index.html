@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>登入 - Supabase Sample</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { font-family: -apple-system, "Segoe UI", "Microsoft JhengHei", sans-serif;
+         background:#f5f5f7; display:flex; justify-content:center; align-items:center;
+         height:100vh; margin:0; }
+  .card { background:#fff; padding:32px 40px; border-radius:12px;
+          box-shadow:0 2px 12px rgba(0,0,0,0.1); width:320px; }
+  h1 { font-size:20px; margin-bottom:24px; text-align:center; }
+  label { display:block; font-size:13px; color:#555; margin-bottom:4px; margin-top:14px; }
+  input { width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;
+          font-size:14px; box-sizing:border-box; }
+  button { width:100%; margin-top:22px; padding:11px; background:#0d6efd; color:#fff;
+           border:none; border-radius:6px; font-size:15px; cursor:pointer; }
+  button:hover { background:#0b5ed7; }
+  .msg { margin-top:14px; font-size:13px; text-align:center; min-height:18px; }
+  .msg.error { color:#d33; }
+  .msg.ok { color:#2a8a3e; }
+  .switch { margin-top:18px; text-align:center; font-size:13px; }
+  .switch a { color:#0d6efd; text-decoration:none; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>禮盒訂購系統（Sample）</h1>
+
+  <form id="loginForm">
+    <label>帳號（Email）</label>
+    <input type="email" id="email" required placeholder="you@example.com">
+
+    <label>密碼</label>
+    <input type="password" id="password" required placeholder="至少 6 碼">
+
+    <button type="submit">登入</button>
+    <div class="msg" id="msg"></div>
+  </form>
+
+  <div class="switch">
+    還沒有帳號？<a href="signup.html">註冊新帳號</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+  // 若已登入，直接跳去 dashboard
+  supabaseClient.auth.getSession().then(({ data }) => {
+    if (data.session) window.location.href = "dashboard.html";
+  });
+
+  const form = document.getElementById("loginForm");
+  const msg = document.getElementById("msg");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    msg.textContent = "登入中...";
+    msg.className = "msg";
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      msg.textContent = "登入失敗：" + error.message;
+      msg.className = "msg error";
+    } else {
+      msg.textContent = "登入成功，跳轉中...";
+      msg.className = "msg ok";
+      window.location.href = "dashboard.html";
+    }
+  });
+</script>
+
+</body>
+</html>
